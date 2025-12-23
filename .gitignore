@@ -3,3 +3,12 @@ dist/
 .env
 .DS_Store
 coverage/
+
+# .NET
+[Bb]in/
+[Oo]bj/
+.vscode/
+.vs/
+*.user
+*.suo
+*.userprefs
