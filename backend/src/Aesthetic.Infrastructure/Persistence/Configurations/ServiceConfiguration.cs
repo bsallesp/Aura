@@ -11,21 +11,19 @@ namespace Aesthetic.Infrastructure.Persistence.Configurations
             builder.HasKey(s => s.Id);
 
             builder.Property(s => s.Name)
-                .HasMaxLength(150)
-                .IsRequired();
-
-            builder.Property(s => s.Price)
-                .HasPrecision(18, 2)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(100);
 
             builder.Property(s => s.Description)
                 .HasMaxLength(500);
 
-            // 1:N Relationship Service -> Appointments
-            builder.HasMany(s => s.Appointments)
-                .WithOne(a => a.Service)
-                .HasForeignKey(a => a.ServiceId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Property(s => s.Price)
+                .HasPrecision(18, 2);
+
+            builder.HasOne(s => s.Professional)
+                .WithMany(p => p.Services)
+                .HasForeignKey(s => s.ProfessionalId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

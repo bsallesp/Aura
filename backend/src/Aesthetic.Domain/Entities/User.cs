@@ -14,6 +14,7 @@ namespace Aesthetic.Domain.Entities
 
         // Navigation properties
         public virtual Professional? ProfessionalProfile { get; private set; }
+        public virtual ICollection<Appointment> AppointmentsAsCustomer { get; private set; } = new List<Appointment>();
 
         protected User() 
         {

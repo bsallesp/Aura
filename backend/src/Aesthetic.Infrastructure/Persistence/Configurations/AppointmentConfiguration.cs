@@ -1,4 +1,5 @@
 using Aesthetic.Domain.Entities;
+using Aesthetic.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,17 +11,25 @@ namespace Aesthetic.Infrastructure.Persistence.Configurations
         {
             builder.HasKey(a => a.Id);
 
+            builder.Property(a => a.Status)
+                .HasConversion<string>();
+
             builder.Property(a => a.PriceAtBooking)
-                .HasPrecision(18, 2)
-                .IsRequired();
+                .HasPrecision(18, 2);
 
-            builder.Property(a => a.StripePaymentIntentId)
-                .HasMaxLength(100);
-
-            // N:1 Relationship Appointment -> Customer (User)
             builder.HasOne(a => a.Customer)
-                .WithMany()
+                .WithMany(u => u.AppointmentsAsCustomer)
                 .HasForeignKey(a => a.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(a => a.Professional)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.ProfessionalId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(a => a.Service)
+                .WithMany(s => s.Appointments)
+                .HasForeignKey(a => a.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -16,7 +16,11 @@ namespace Aesthetic.Domain.Entities
         public virtual Professional Professional { get; private set; } = null!;
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
 
-        protected Service() { }
+        protected Service()
+        {
+            Name = null!;
+            Description = null!;
+        }
 
         public Service(Guid professionalId, string name, decimal price, int durationMinutes, string? description = null)
         {
