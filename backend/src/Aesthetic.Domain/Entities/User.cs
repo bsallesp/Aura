@@ -15,7 +15,13 @@ namespace Aesthetic.Domain.Entities
         // Navigation properties
         public virtual Professional? ProfessionalProfile { get; private set; }
 
-        protected User() { } // EF Core
+        protected User() 
+        {
+            FirstName = null!;
+            LastName = null!;
+            Email = null!;
+            PasswordHash = null!;
+        }
 
         public User(string firstName, string lastName, string email, string passwordHash, UserRole role)
         {

@@ -20,9 +20,9 @@ namespace Aesthetic.Domain.Entities
         public virtual Professional Professional { get; private set; } = null!;
         public virtual Service Service { get; private set; } = null!;
 
-        protected Appointment() { }
+            protected Appointment() { }
 
-        public Appointment(Guid customerId, Guid professionalId, Guid serviceId, DateTime startTime, int durationMinutes, decimal price)
+            public Appointment(Guid customerId, Guid professionalId, Guid serviceId, DateTime startTime, int durationMinutes, decimal price)
         {
             if (startTime < DateTime.UtcNow) throw new ArgumentException("Cannot book appointment in the past.", nameof(startTime));
             if (durationMinutes <= 0) throw new ArgumentException("Duration must be positive.", nameof(durationMinutes));
