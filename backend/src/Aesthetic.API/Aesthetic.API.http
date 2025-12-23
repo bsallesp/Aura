@@ -1,4 +1,4 @@
-@Aesthetic.API_HostAddress = http://localhost:5177
+@Aesthetic.API_HostAddress = http://localhost:5101
 
 GET {{Aesthetic.API_HostAddress}}/weatherforecast/
 Accept: application/json
