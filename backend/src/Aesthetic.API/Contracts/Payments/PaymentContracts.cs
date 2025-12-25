@@ -1,9 +1,7 @@
 namespace Aesthetic.API.Contracts.Payments
 {
     public record CreatePaymentIntentRequest(
-        decimal Amount,
-        string Currency,
-        string Description
+        Guid AppointmentId
     );
 
     public record CreatePaymentIntentResponse(

@@ -20,14 +20,15 @@ public class StripePaymentService : IPaymentService
         _pipeline = pipelineProvider.GetPipeline("stripe-pipeline");
     }
 
-    public async Task<string> CreatePaymentIntentAsync(decimal amount, string currency, string description, string? connectedAccountId = null, decimal applicationFeeAmount = 0, string? idempotencyKey = null)
+    public async Task<string> CreatePaymentIntentAsync(decimal amount, string currency, string description, string? connectedAccountId = null, decimal applicationFeeAmount = 0, string? idempotencyKey = null, Dictionary<string, string>? metadata = null)
     {
         var options = new PaymentIntentCreateOptions
         {
             Amount = (long)(amount * 100), // Stripe expects amount in cents
             Currency = currency,
             Description = description,
-            PaymentMethodTypes = new List<string> { "card" }
+            PaymentMethodTypes = new List<string> { "card" },
+            Metadata = metadata
         };
 
         if (!string.IsNullOrEmpty(connectedAccountId))
