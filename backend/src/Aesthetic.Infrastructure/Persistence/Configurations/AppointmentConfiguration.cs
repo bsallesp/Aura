@@ -17,6 +17,11 @@ namespace Aesthetic.Infrastructure.Persistence.Configurations
             builder.Property(a => a.PriceAtBooking)
                 .HasPrecision(18, 2);
 
+            builder.Property(a => a.CancellationFeeAmount)
+                .HasPrecision(18, 2);
+
+            builder.Property(a => a.CancelledAt);
+
             builder.HasOne(a => a.Customer)
                 .WithMany(u => u.AppointmentsAsCustomer)
                 .HasForeignKey(a => a.CustomerId)

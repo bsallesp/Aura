@@ -14,6 +14,8 @@ namespace Aesthetic.Domain.Entities
         public AppointmentStatus Status { get; private set; }
         public decimal PriceAtBooking { get; private set; }
         public string? StripePaymentIntentId { get; private set; }
+        public DateTime? CancelledAt { get; private set; }
+        public decimal? CancellationFeeAmount { get; private set; }
 
         // Navigation properties
         public virtual User Customer { get; private set; } = null!;
@@ -45,11 +47,13 @@ namespace Aesthetic.Domain.Entities
             UpdateTimestamp();
         }
 
-        public void Cancel()
+        public void Cancel(decimal? cancellationFee)
         {
             if (Status == AppointmentStatus.Completed) throw new InvalidOperationException("Cannot cancel a completed appointment.");
-            
+
             Status = AppointmentStatus.Cancelled;
+            CancelledAt = DateTime.UtcNow;
+            CancellationFeeAmount = cancellationFee;
             UpdateTimestamp();
         }
 
