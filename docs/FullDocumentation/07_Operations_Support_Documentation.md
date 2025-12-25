@@ -21,6 +21,11 @@
 - Rate-limit incidents: identify abusive IPs, adjust policies temporarily.
  - Cache invalidation: clear `services_active` when service CRUD occurs.
 
+## Log Retention & Cleanup
+- Audit Logs: retained for `AuditLogRetentionDays` (default 365).
+  - Automated nightly cleanup via `AuditLogRetentionService`.
+- Application Logs (File): rolled daily (`rollingInterval: RollingInterval.Day`).
+
 ## Troubleshooting
 - Payment issues: check Stripe dashboard events, Metadata `AppointmentId` consistency.
 - Booking conflicts: review availability and `HasConflictAsync` outcomes.

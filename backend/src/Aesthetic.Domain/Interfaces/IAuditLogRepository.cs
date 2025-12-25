@@ -4,4 +4,5 @@ namespace Aesthetic.Domain.Interfaces;
 
 public interface IAuditLogRepository : IRepository<AuditLog>
 {
+    Task<int> DeleteOlderThanAsync(DateTime cutoffDate);
 }

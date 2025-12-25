@@ -63,6 +63,8 @@ namespace Aesthetic.Infrastructure
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IAuditService, AuditService>();
 
+            services.AddHostedService<AuditLogRetentionService>();
+
             return services;
         }
     }
