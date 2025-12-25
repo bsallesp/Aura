@@ -8,6 +8,7 @@ namespace Aesthetic.Domain.Entities
     {
         public Guid UserId { get; private set; }
         public string BusinessName { get; private set; }
+        public string? Specialty { get; private set; }
         public string? Bio { get; private set; }
         public string? StripeAccountId { get; private set; }
         public bool IsStripeOnboardingCompleted { get; private set; }
@@ -20,21 +21,22 @@ namespace Aesthetic.Domain.Entities
         protected Professional() 
         {
             BusinessName = null!;
+            Specialty = null!;
             Bio = null!;
         }
 
-        public Professional(Guid userId, string businessName, string? bio = null)
+        public Professional(Guid userId, string businessName, string? specialty, string? bio = null)
         {
             if (string.IsNullOrWhiteSpace(businessName)) throw new ArgumentException("Business name is required.", nameof(businessName));
             
             UserId = userId;
             BusinessName = businessName;
+            Specialty = specialty;
             Bio = bio;
         }
 
-        public void SetStripeAccountId(string stripeAccountId)
+        public void UpdateStripeAccountId(string stripeAccountId)
         {
-            if (string.IsNullOrWhiteSpace(stripeAccountId)) throw new ArgumentException("Stripe Account ID is required.", nameof(stripeAccountId));
             StripeAccountId = stripeAccountId;
         }
 

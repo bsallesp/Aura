@@ -8,7 +8,10 @@ namespace Aesthetic.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Professional> builder)
         {
-            builder.HasKey(p => p.UserId); // Using UserId as PK since it's 1:1
+            builder.HasKey(p => p.Id);
+
+            builder.Property(p => p.UserId)
+                .IsRequired();
 
             builder.Property(p => p.BusinessName)
                 .IsRequired()

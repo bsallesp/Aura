@@ -11,6 +11,7 @@ namespace Aesthetic.Domain.Entities
         public string? Description { get; private set; }
         public decimal Price { get; private set; }
         public int DurationMinutes { get; private set; }
+        public bool IsActive { get; private set; }
 
         // Navigation properties
         public virtual Professional Professional { get; private set; } = null!;
@@ -20,6 +21,7 @@ namespace Aesthetic.Domain.Entities
         {
             Name = null!;
             Description = null!;
+            IsActive = true;
         }
 
         public Service(Guid professionalId, string name, decimal price, int durationMinutes, string? description = null)
@@ -33,6 +35,7 @@ namespace Aesthetic.Domain.Entities
             Price = price;
             DurationMinutes = durationMinutes;
             Description = description;
+            IsActive = true;
         }
 
         public void UpdateDetails(string name, decimal price, int durationMinutes, string? description)
@@ -45,6 +48,18 @@ namespace Aesthetic.Domain.Entities
             Price = price;
             DurationMinutes = durationMinutes;
             Description = description;
+            UpdateTimestamp();
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+            UpdateTimestamp();
+        }
+
+        public void Activate()
+        {
+            IsActive = true;
             UpdateTimestamp();
         }
     }

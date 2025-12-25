@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Aesthetic.Infrastructure.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AestheticDbContext))]
+    partial class AestheticDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -50,12 +50,12 @@ namespace Aesthetic.Infrastructure.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("StripePaymentIntentId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -92,6 +92,9 @@ namespace Aesthetic.Infrastructure.Migrations
                     b.Property<bool>("IsStripeOnboardingCompleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Specialty")
+                        .HasColumnType("text");
+
                     b.Property<string>("StripeAccountId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -126,10 +129,13 @@ namespace Aesthetic.Infrastructure.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -176,8 +182,9 @@ namespace Aesthetic.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -193,7 +200,7 @@ namespace Aesthetic.Infrastructure.Migrations
             modelBuilder.Entity("Aesthetic.Domain.Entities.Appointment", b =>
                 {
                     b.HasOne("Aesthetic.Domain.Entities.User", "Customer")
-                        .WithMany()
+                        .WithMany("AppointmentsAsCustomer")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -253,6 +260,8 @@ namespace Aesthetic.Infrastructure.Migrations
 
             modelBuilder.Entity("Aesthetic.Domain.Entities.User", b =>
                 {
+                    b.Navigation("AppointmentsAsCustomer");
+
                     b.Navigation("ProfessionalProfile");
                 });
 #pragma warning restore 612, 618

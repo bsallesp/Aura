@@ -34,5 +34,15 @@ namespace Aesthetic.Infrastructure.Persistence.Repositories
                 .Where(a => a.StartTime >= start && a.StartTime <= end)
                 .ToListAsync();
         }
+
+        public async Task<bool> HasConflictAsync(Guid professionalId, DateTime startTime, DateTime endTime)
+        {
+            return await _dbSet
+                .AnyAsync(a => 
+                    a.ProfessionalId == professionalId &&
+                    a.Status != Domain.Enums.AppointmentStatus.Cancelled &&
+                    a.StartTime < endTime && 
+                    a.EndTime > startTime);
+        }
     }
 }

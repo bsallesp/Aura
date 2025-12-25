@@ -1,5 +1,6 @@
 using Aesthetic.Domain.Common;
 using Aesthetic.Domain.Enums;
+using Aesthetic.Domain.Events;
 using System;
 
 namespace Aesthetic.Domain.Entities
@@ -35,6 +36,8 @@ namespace Aesthetic.Domain.Entities
             Email = email;
             PasswordHash = passwordHash;
             Role = role;
+
+            AddDomainEvent(new UserRegisteredEvent(this));
         }
 
         public void SetProfessionalProfile(Professional professional)

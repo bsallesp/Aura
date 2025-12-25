@@ -1,0 +1,97 @@
+using Aesthetic.API.Contracts.Professionals;
+using Aesthetic.Application.Professionals.Commands.CreateProfile;
+using Aesthetic.Application.Professionals.Queries.GetAllProfessionals;
+using Aesthetic.Application.Professionals.Queries.GetProfile;
+using Aesthetic.Application.Professionals.Queries.SearchBySpecialty;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace Aesthetic.API.Controllers
+{
+    [ApiController]
+    [Route("professionals")]
+    public class ProfessionalsController : ControllerBase
+    {
+        private readonly ISender _sender;
+
+        public ProfessionalsController(ISender sender)
+        {
+            _sender = sender;
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> CreateProfile(CreateProfessionalRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            try
+            {
+                var command = new CreateProfileCommand(
+                    userId,
+                    request.BusinessName,
+                    request.Specialty,
+                    request.Bio);
+
+                var professional = await _sender.Send(command);
+
+                var response = new ProfessionalResponse(
+                    professional.UserId,
+                    professional.BusinessName,
+                    professional.Specialty,
+                    professional.Bio);
+
+                return CreatedAtAction(nameof(GetProfile), new { userId = professional.UserId }, response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetProfile(Guid userId)
+        {
+            var query = new GetProfileQuery(userId);
+            var professional = await _sender.Send(query);
+            
+            if (professional == null) return NotFound();
+
+            var response = new ProfessionalResponse(
+                professional.UserId,
+                professional.BusinessName,
+                professional.Specialty,
+                professional.Bio);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] string? specialty)
+        {
+            IEnumerable<Aesthetic.Domain.Entities.Professional> professionals;
+
+            if (string.IsNullOrWhiteSpace(specialty))
+            {
+                professionals = await _sender.Send(new GetAllProfessionalsQuery());
+            }
+            else
+            {
+                professionals = await _sender.Send(new SearchBySpecialtyQuery(specialty));
+            }
+
+            var response = professionals.Select(p => new ProfessionalResponse(
+                p.UserId,
+                p.BusinessName,
+                p.Specialty,
+                p.Bio));
+
+            return Ok(response);
+        }
+    }
+}
