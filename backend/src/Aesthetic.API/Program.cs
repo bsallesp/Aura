@@ -73,7 +73,16 @@ builder.Services.AddAuthentication(defaultScheme: JwtBearerDefaults.Authenticati
     });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("v1", options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info.Title = "Aesthetic API";
+        document.Info.Version = "v1";
+        document.Info.Description = "API for Aesthetic Appointment Management System";
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -83,7 +92,12 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "Aesthetic API";
+        options.Theme = ScalarTheme.Mars;
+        options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 
 app.UseHttpsRedirection();
