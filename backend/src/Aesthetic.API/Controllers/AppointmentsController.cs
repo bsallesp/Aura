@@ -6,6 +6,7 @@ using Aesthetic.Application.Appointments.Commands.ConfirmAppointment;
 using Aesthetic.Application.Appointments.Queries.GetAvailableSlots;
 using Aesthetic.Application.Appointments.Queries.GetCustomerAppointments;
 using Aesthetic.Application.Appointments.Queries.GetProfessionalAppointments;
+using Aesthetic.Application.Professionals.Queries.GetProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +83,7 @@ namespace Aesthetic.API.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
             
-            var query = new GetCustomerAppointmentsQuery(userId);
+            var query = new GetCustomerAppointmentsQuery(userId, userId);
             var appointments = await _sender.Send(query);
 
             var response = appointments.Select(a => new AppointmentResponse(
@@ -99,6 +100,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpGet("professional")]
+        [Authorize(Roles = "Professional")]
         public async Task<IActionResult> GetProfessionalAppointments()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -106,7 +108,11 @@ namespace Aesthetic.API.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
             
-            var query = new GetProfessionalAppointmentsQuery(userId);
+            // Resolve professional from user
+            var professional = await _sender.Send(new GetProfileQuery(userId));
+            if (professional == null) return BadRequest(new { error = "User is not a professional." });
+
+            var query = new GetProfessionalAppointmentsQuery(professional.Id, userId);
             var appointments = await _sender.Send(query);
 
             var response = appointments.Select(a => new AppointmentResponse(

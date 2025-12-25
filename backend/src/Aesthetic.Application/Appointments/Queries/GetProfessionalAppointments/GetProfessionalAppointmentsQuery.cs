@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Aesthetic.Application.Appointments.Queries.GetProfessionalAppointments;
 
-public record GetProfessionalAppointmentsQuery(Guid ProfessionalId) : IRequest<IEnumerable<Appointment>>;
+public record GetProfessionalAppointmentsQuery(Guid ProfessionalId, Guid ActorUserId) : IRequest<IEnumerable<Appointment>>;
