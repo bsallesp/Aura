@@ -2,6 +2,7 @@ using Aesthetic.API.Contracts.Appointments;
 using Aesthetic.Application.Appointments.Commands.BookAppointment;
 using Aesthetic.Application.Appointments.Commands.CancelAppointment;
 using Aesthetic.Application.Appointments.Commands.ConfirmAppointment;
+using Aesthetic.Application.Appointments.Queries.GetAvailableSlots;
 using Aesthetic.Application.Appointments.Queries.GetCustomerAppointments;
 using Aesthetic.Application.Appointments.Queries.GetProfessionalAppointments;
 using MediatR;
@@ -21,6 +22,22 @@ namespace Aesthetic.API.Controllers
         public AppointmentsController(ISender sender)
         {
             _sender = sender;
+        }
+
+        [HttpGet("slots")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAvailableSlots([FromQuery] Guid professionalId, [FromQuery] Guid serviceId, [FromQuery] DateTime date)
+        {
+            try
+            {
+                var query = new GetAvailableSlotsQuery(professionalId, serviceId, date);
+                var slots = await _sender.Send(query);
+                return Ok(slots);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPost]

@@ -35,6 +35,18 @@ namespace Aesthetic.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Appointment>> GetByProfessionalAndDateAsync(Guid professionalId, DateTime date)
+        {
+            var startOfDay = date.Date;
+            var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+
+            return await _dbSet
+                .Where(a => a.ProfessionalId == professionalId &&
+                            a.StartTime >= startOfDay &&
+                            a.StartTime <= endOfDay)
+                .ToListAsync();
+        }
+
         public async Task<bool> HasConflictAsync(Guid professionalId, DateTime startTime, DateTime endTime)
         {
             return await _dbSet

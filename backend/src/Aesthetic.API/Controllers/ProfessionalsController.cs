@@ -1,6 +1,8 @@
 using Aesthetic.API.Contracts.Professionals;
 using Aesthetic.Application.Professionals.Commands.CreateProfile;
+using Aesthetic.Application.Professionals.Commands.UpdateAvailability;
 using Aesthetic.Application.Professionals.Queries.GetAllProfessionals;
+using Aesthetic.Application.Professionals.Queries.GetAvailability;
 using Aesthetic.Application.Professionals.Queries.GetProfile;
 using Aesthetic.Application.Professionals.Queries.SearchBySpecialty;
 using MediatR;
@@ -90,6 +92,50 @@ namespace Aesthetic.API.Controllers
                 p.BusinessName,
                 p.Specialty,
                 p.Bio));
+
+            return Ok(response);
+        }
+
+        [HttpPut("availability")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAvailability(UpdateAvailabilityRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+            var professional = await _sender.Send(new GetProfileQuery(userId));
+            
+            if (professional == null) return NotFound("Professional profile not found.");
+
+            var command = new UpdateAvailabilityCommand(
+                professional.Id,
+                request.DayOfWeek,
+                request.StartTime,
+                request.EndTime,
+                request.IsDayOff
+            );
+
+            await _sender.Send(command);
+
+            return NoContent();
+        }
+
+        [HttpGet("{userId}/availability")]
+        public async Task<IActionResult> GetAvailability(Guid userId)
+        {
+            var professional = await _sender.Send(new GetProfileQuery(userId));
+            if (professional == null) return NotFound("Professional not found.");
+
+            var query = new GetAvailabilityQuery(professional.Id);
+            var availabilities = await _sender.Send(query);
+
+            var response = availabilities.Select(a => new AvailabilityResponse(
+                a.DayOfWeek,
+                a.StartTime,
+                a.EndTime,
+                a.IsDayOff
+            ));
 
             return Ok(response);
         }

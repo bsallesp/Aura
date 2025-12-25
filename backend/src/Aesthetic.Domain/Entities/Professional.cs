@@ -17,6 +17,7 @@ namespace Aesthetic.Domain.Entities
         public virtual User User { get; private set; } = null!;
         public virtual ICollection<Service> Services { get; private set; } = new List<Service>();
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<ProfessionalAvailability> Availabilities { get; private set; } = new List<ProfessionalAvailability>();
 
         protected Professional() 
         {
@@ -43,6 +44,20 @@ namespace Aesthetic.Domain.Entities
         public void CompleteStripeOnboarding()
         {
             IsStripeOnboardingCompleted = true;
+        }
+
+        public void UpdateAvailability(DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan endTime, bool isDayOff)
+        {
+            var existingAvailability = Availabilities.FirstOrDefault(a => a.DayOfWeek == dayOfWeek);
+
+            if (existingAvailability != null)
+            {
+                existingAvailability.Update(startTime, endTime, isDayOff);
+            }
+            else
+            {
+                Availabilities.Add(new ProfessionalAvailability(Id, dayOfWeek, startTime, endTime, isDayOff));
+            }
         }
     }
 }
