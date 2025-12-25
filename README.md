@@ -1,12 +1,12 @@
 # Aesthetic Project
 
-## Visão Geral
-Projeto de backend seguindo princípios SOLID e Clean Code.
+## Overview
+Backend project following SOLID and Clean Code principles.
 
-## Estrutura
-- `backend/`: Código fonte do backend.
-- `docs/`: Documentação do projeto.
+## Structure
+- `backend/`: Backend source code.
+- `docs/`: Project documentation.
 
-## Pré-requisitos
-- Node.js (versão a definir)
+## Prerequisites
+- Node.js (version TBD)
 - Git
