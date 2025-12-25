@@ -141,5 +141,22 @@ namespace Aesthetic.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("{userId}/slots")]
+        public async Task<IActionResult> GetAvailableSlots(Guid userId, [FromQuery] Guid serviceId, [FromQuery] DateTime date)
+        {
+            var professional = await _sender.Send(new GetProfileQuery(userId));
+            if (professional == null) return NotFound("Professional not found.");
+
+            var query = new Aesthetic.Application.Appointments.Queries.GetAvailableSlots.GetAvailableSlotsQuery(
+                professional.Id,
+                serviceId,
+                date
+            );
+
+            var slots = await _sender.Send(query);
+
+            return Ok(slots);
+        }
     }
 }
