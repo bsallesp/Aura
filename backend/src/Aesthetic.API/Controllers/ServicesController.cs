@@ -136,11 +136,15 @@ namespace Aesthetic.API.Controllers
         {
             try
             {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null) return Unauthorized();
+                var actorUserId = Guid.Parse(userIdClaim.Value);
                 await _sender.Send(new UpdateServicePoliciesCommand(
                     serviceId,
                     request.DepositPercentage,
                     request.CancelFeePercentage,
-                    request.CancelFeeWindowHours));
+                    request.CancelFeeWindowHours,
+                    actorUserId));
                 return NoContent();
             }
             catch (ArgumentException ex)

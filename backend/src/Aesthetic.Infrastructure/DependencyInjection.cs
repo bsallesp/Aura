@@ -1,8 +1,10 @@
 using Aesthetic.Application.Common.Interfaces.Authentication;
 using Aesthetic.Application.Common.Interfaces.Payments;
+using Aesthetic.Application.Common.Interfaces.Security;
 using Aesthetic.Domain.Interfaces;
 using Aesthetic.Infrastructure.Authentication;
 using Aesthetic.Infrastructure.Payments;
+using Aesthetic.Infrastructure.Auditing;
 using Aesthetic.Infrastructure.Persistence;
 using Aesthetic.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +59,9 @@ namespace Aesthetic.Infrastructure
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IAuditService, AuditService>();
 
             return services;
         }

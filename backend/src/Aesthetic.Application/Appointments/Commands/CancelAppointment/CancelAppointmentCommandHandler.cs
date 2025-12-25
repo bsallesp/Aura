@@ -1,4 +1,5 @@
 using Aesthetic.Domain.Interfaces;
+using Aesthetic.Application.Common.Interfaces.Security;
 using System;
 using MediatR;
 
@@ -9,12 +10,14 @@ public class CancelAppointmentCommandHandler : IRequestHandler<CancelAppointment
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IServiceRepository _serviceRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuditService _auditService;
 
-    public CancelAppointmentCommandHandler(IAppointmentRepository appointmentRepository, IServiceRepository serviceRepository, IUnitOfWork unitOfWork)
+    public CancelAppointmentCommandHandler(IAppointmentRepository appointmentRepository, IServiceRepository serviceRepository, IUnitOfWork unitOfWork, IAuditService auditService)
     {
         _appointmentRepository = appointmentRepository;
         _serviceRepository = serviceRepository;
         _unitOfWork = unitOfWork;
+        _auditService = auditService;
     }
 
     public async Task Handle(CancelAppointmentCommand request, CancellationToken cancellationToken)
@@ -40,5 +43,8 @@ public class CancelAppointmentCommandHandler : IRequestHandler<CancelAppointment
         appointment.Cancel(fee);
         await _appointmentRepository.UpdateAsync(appointment);
         await _unitOfWork.SaveChangesAsync();
+
+        await _auditService.LogAsync(request.ActorUserId, "Appointment.Cancel", "Appointment", appointment.Id,
+            fee is null ? null : $"{{\"CancellationFeeAmount\":{fee}}}");
     }
 }

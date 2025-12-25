@@ -27,6 +27,7 @@
 ## Audit Logs
 - Immutable logs of PHI read/write (Medical), security events, and administrative actions.
 - Retention: configurable per tenant (e.g., 1–7 years) per regulatory guidance.
+ - Implementation: application-level audit service writes `Action`, `ResourceType`, `ResourceId`, optional metadata (no PHI) with `UserId` when available. Persistence via EF Core and restricted update paths.
 
 ## Compliance
 - HIPAA: Privacy Rule, Security Rule, Breach Notification; BAAs with customers and PHI providers; neutral notifications.

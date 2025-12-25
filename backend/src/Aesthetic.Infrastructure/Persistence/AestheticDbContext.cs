@@ -19,6 +19,7 @@ namespace Aesthetic.Infrastructure.Persistence
         public DbSet<Service> Services { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<ProfessionalAvailability> ProfessionalAvailabilities { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -147,7 +147,10 @@ namespace Aesthetic.API.Controllers
         {
             try
             {
-                var command = new CancelAppointmentCommand(appointmentId);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null) return Unauthorized();
+                var actorUserId = Guid.Parse(userIdClaim.Value);
+                var command = new CancelAppointmentCommand(appointmentId, actorUserId);
                 await _sender.Send(command);
                 return NoContent();
             }
