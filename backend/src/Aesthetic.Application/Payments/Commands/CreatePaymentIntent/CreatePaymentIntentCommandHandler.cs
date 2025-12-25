@@ -19,7 +19,8 @@ public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIn
             request.Currency,
             request.Description ?? string.Empty,
             null, // CustomerId - currently null in controller
-            0     // ApplicationFeeAmount - currently 0 in controller
+            0,     // ApplicationFeeAmount - currently 0 in controller
+            request.IdempotencyKey
         );
     }
 }

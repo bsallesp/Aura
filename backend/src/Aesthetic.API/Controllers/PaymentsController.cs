@@ -23,10 +23,13 @@ namespace Aesthetic.API.Controllers
         {
             try
             {
+                var idempotencyKey = Request.Headers["Idempotency-Key"].ToString();
+                
                 var command = new CreatePaymentIntentCommand(
                     request.Amount,
                     request.Currency,
-                    request.Description);
+                    request.Description,
+                    string.IsNullOrEmpty(idempotencyKey) ? null : idempotencyKey);
 
                 var clientSecret = await _sender.Send(command);
 

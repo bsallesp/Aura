@@ -18,7 +18,7 @@ namespace Aesthetic.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 
-        public async Task<Professional?> GetByIdAsync(Guid id)
+        public override async Task<Professional?> GetByIdAsync(Guid id)
         {
             return await _dbSet
                 .Include(p => p.User)
