@@ -12,6 +12,7 @@ namespace Aesthetic.UnitTests.Application.Payments.Commands
         private readonly Mock<IPaymentService> _paymentServiceMock;
         private readonly Mock<IAppointmentRepository> _appointmentRepositoryMock;
         private readonly Mock<IProfessionalRepository> _professionalRepositoryMock;
+        private readonly Mock<IServiceRepository> _serviceRepositoryMock;
         private readonly CreatePaymentIntentCommandHandler _handler;
 
         public CreatePaymentIntentCommandHandlerTests()
@@ -19,14 +20,16 @@ namespace Aesthetic.UnitTests.Application.Payments.Commands
             _paymentServiceMock = new Mock<IPaymentService>();
             _appointmentRepositoryMock = new Mock<IAppointmentRepository>();
             _professionalRepositoryMock = new Mock<IProfessionalRepository>();
+            _serviceRepositoryMock = new Mock<IServiceRepository>();
             _handler = new CreatePaymentIntentCommandHandler(
                 _paymentServiceMock.Object,
                 _appointmentRepositoryMock.Object,
-                _professionalRepositoryMock.Object);
+                _professionalRepositoryMock.Object,
+                _serviceRepositoryMock.Object);
         }
 
         [Fact]
-        public async Task Handle_ShouldCreatePaymentIntent_WhenAppointmentIsValid()
+        public async Task Handle_ShouldCreatePaymentIntent_FullAmount_WhenNoDeposit()
         {
             // Arrange
             var appointmentId = Guid.NewGuid();
@@ -49,6 +52,9 @@ namespace Aesthetic.UnitTests.Application.Payments.Commands
             _professionalRepositoryMock.Setup(x => x.GetByIdAsync(professionalId))
                 .ReturnsAsync(professional);
 
+            _serviceRepositoryMock.Setup(x => x.GetByIdAsync(serviceId))
+                .ReturnsAsync(new Service(professionalId, "Svc", price, 60));
+
             _paymentServiceMock.Setup(x => x.CreatePaymentIntentAsync(
                 It.IsAny<decimal>(),
                 It.IsAny<string>(),
@@ -68,6 +74,57 @@ namespace Aesthetic.UnitTests.Application.Payments.Commands
             Assert.Equal("pi_123", result);
             _paymentServiceMock.Verify(x => x.CreatePaymentIntentAsync(
                 price,
+                "usd",
+                It.Is<string>(s => s.Contains("Appointment for")),
+                "acct_123",
+                0,
+                null,
+                It.Is<Dictionary<string, string>>(m => m["AppointmentId"] == appointmentId.ToString())), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldCreatePaymentIntent_DepositAmount_WhenDepositSet()
+        {
+            // Arrange
+            var appointmentId = Guid.NewGuid();
+            var customerId = Guid.NewGuid();
+            var professionalId = Guid.NewGuid();
+            var serviceId = Guid.NewGuid();
+            var startTime = DateTime.UtcNow.AddDays(1);
+            var price = 200m;
+
+            var appointment = new Appointment(customerId, professionalId, serviceId, startTime, 60, price);
+            typeof(Appointment).GetProperty("Id").SetValue(appointment, appointmentId);
+
+            var professional = new Professional(Guid.NewGuid(), "Biz", "Spec");
+            professional.UpdateStripeAccountId("acct_123");
+
+            var service = new Service(professionalId, "Svc", price, 60);
+            service.UpdatePolicies(0.25m, null, null); // 25% deposit
+
+            _appointmentRepositoryMock.Setup(x => x.GetByIdAsync(appointmentId)).ReturnsAsync(appointment);
+            _professionalRepositoryMock.Setup(x => x.GetByIdAsync(professionalId)).ReturnsAsync(professional);
+            _serviceRepositoryMock.Setup(x => x.GetByIdAsync(serviceId)).ReturnsAsync(service);
+
+            _paymentServiceMock.Setup(x => x.CreatePaymentIntentAsync(
+                It.IsAny<decimal>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<decimal>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, string>>()))
+                .ReturnsAsync("pi_dep_123");
+
+            var command = new CreatePaymentIntentCommand(appointmentId, null);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.Equal("pi_dep_123", result);
+            _paymentServiceMock.Verify(x => x.CreatePaymentIntentAsync(
+                50m, // 25% of 200
                 "usd",
                 It.Is<string>(s => s.Contains("Appointment for")),
                 "acct_123",

@@ -20,6 +20,14 @@ namespace Aesthetic.Infrastructure.Persistence.Configurations
             builder.Property(s => s.Price)
                 .HasPrecision(18, 2);
 
+            builder.Property(s => s.DepositPercentage)
+                .HasPrecision(5, 4);
+
+            builder.Property(s => s.CancelFeePercentage)
+                .HasPrecision(5, 4);
+
+            builder.Property(s => s.CancelFeeWindowHours);
+
             builder.HasOne(s => s.Professional)
                 .WithMany(p => p.Services)
                 .HasForeignKey(s => s.ProfessionalId)

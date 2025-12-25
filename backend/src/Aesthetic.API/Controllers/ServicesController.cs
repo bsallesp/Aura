@@ -9,6 +9,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
+using Aesthetic.API.Contracts.Services;
+using Aesthetic.Application.Services.Commands.UpdateServicePolicies;
 
 namespace Aesthetic.API.Controllers
 {
@@ -18,10 +21,12 @@ namespace Aesthetic.API.Controllers
     public class ServicesController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly IMemoryCache _cache;
 
-        public ServicesController(ISender sender)
+        public ServicesController(ISender sender, IMemoryCache cache)
         {
             _sender = sender;
+            _cache = cache;
         }
 
         [HttpPost]
@@ -86,7 +91,11 @@ namespace Aesthetic.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllActiveServices()
         {
-            var services = await _sender.Send(new GetAllActiveServicesQuery());
+            if (!_cache.TryGetValue("services_active", out IEnumerable<Aesthetic.Domain.Entities.Service>? services))
+            {
+                services = await _sender.Send(new GetAllActiveServicesQuery());
+                _cache.Set("services_active", services, TimeSpan.FromSeconds(60));
+            }
 
             var response = services.Select(s => new ServiceResponse(
                 s.Id,
@@ -118,6 +127,29 @@ namespace Aesthetic.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("{serviceId}/policies")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePolicies(Guid serviceId, UpdateServicePoliciesRequest request)
+        {
+            try
+            {
+                await _sender.Send(new UpdateServicePoliciesCommand(
+                    serviceId,
+                    request.DepositPercentage,
+                    request.CancelFeePercentage,
+                    request.CancelFeeWindowHours));
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
         }
     }

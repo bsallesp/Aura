@@ -9,15 +9,18 @@ public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIn
     private readonly IPaymentService _paymentService;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IProfessionalRepository _professionalRepository;
+    private readonly IServiceRepository _serviceRepository;
 
     public CreatePaymentIntentCommandHandler(
         IPaymentService paymentService,
         IAppointmentRepository appointmentRepository,
-        IProfessionalRepository professionalRepository)
+        IProfessionalRepository professionalRepository,
+        IServiceRepository serviceRepository)
     {
         _paymentService = paymentService;
         _appointmentRepository = appointmentRepository;
         _professionalRepository = professionalRepository;
+        _serviceRepository = serviceRepository;
     }
 
     public async Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
@@ -46,10 +49,17 @@ public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIn
             { "ProfessionalId", appointment.ProfessionalId.ToString() }
         };
 
-        var description = $"Appointment for {appointment.Service?.Name ?? "Service"}";
+        var service = await _serviceRepository.GetByIdAsync(appointment.ServiceId);
+        var description = $"Appointment for {service?.Name ?? "Service"}";
+
+        var amount = appointment.PriceAtBooking;
+        if (service?.DepositPercentage is not null)
+        {
+            amount = Math.Round(appointment.PriceAtBooking * service.DepositPercentage.Value, 2);
+        }
 
         return await _paymentService.CreatePaymentIntentAsync(
-            appointment.PriceAtBooking,
+            amount,
             "usd", // Assuming USD for now, should come from config or service
             description,
             connectedAccountId, 

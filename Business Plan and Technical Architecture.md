@@ -161,3 +161,47 @@ Official References (HHS/OCR)
 - HIPAA Messaging Policy: enforce neutral reminder templates (no service names); in‑portal sensitive communications only.
 - Media & Consents: define data model and storage requirements for secure media and consent records; select BAA‑covered storage/e‑sign.
 - Audit & RBAC: specify access matrices; log reads/writes of PHI; periodic access reviews and reports.
+
+## 12. Architecture Standards Alignment
+- Architecture/Design
+  - API Versioning: in place (URL + header). Maintain backward compatibility.
+  - Circuit Breaker + Retry + Timeout: in place via Polly pipeline for Stripe.
+  - Idempotency: PaymentIntents accept header; extend to booking/cancellation.
+  - Load Balancer / API Gateway / Service Discovery: not required for single service; plan for gateway if we split services.
+- Communication
+  - Event‑driven: Stripe webhooks + domain events; expand internal events.
+  - Outbox pattern: planned for reliable webhook/event publishing and eventual consistency.
+  - Saga/Process Manager: planned for multi‑step flows (booking → payment → confirmation).
+  - Async messaging: optional backlog (RabbitMQ/Service Bus) for jobs/media.
+  - Schema versioning: maintain DTO/OpenAPI changes with version sets.
+- Observability
+  - Centralized Logging: Serilog.
+  - Distributed Tracing & Metrics: OpenTelemetry.
+  - Health Checks: in place; add readiness/liveness probes for orchestration.
+- Security
+  - Authentication: JWT (consider OAuth2/OIDC later).
+  - Authorization: RBAC/ABAC planned (Medical line minimum necessary).
+  - Secrets management: externalize to vault and rotate regularly.
+  - mTLS: not applicable now; revisit with multi‑service.
+  - Rate limiting/throttling: planned middleware for abusive patterns.
+- Resilience
+  - Graceful degradation/fallbacks: define defaults for payment/connect outages.
+  - Chaos testing: backlog.
+  - DLQs/backpressure: with messaging adoption.
+- Data
+  - CQRS: in place.
+  - Caching (Redis): planned for slots/services queries.
+  - Eventual consistency: adopt with outbox + sagas.
+  - DB per service / read replicas: not needed now; plan read replicas for scale.
+- Versioning & Compatibility
+  - API versioning: in place; ensure backward compatibility on changes.
+  - Feature flags: planned for gradual rollouts.
+  - Canary/Blue‑Green: planned in deployment strategy.
+- DevOps/Operations
+  - CI/CD: planned pipelines with quality gates.
+  - IaC: planned (infra provisioning + secrets/config externalization).
+  - Auto‑scaling: planned with orchestration.
+- Governance & Quality
+  - Code quality/static analysis/dependency scanning: planned in CI.
+  - ADRs: maintain decision records for key architecture choices.
+  - Common code patterns: DTOs, anti‑corruption layer, policy pipelines, cross‑cutting behaviors, domain events (in place and expanding).

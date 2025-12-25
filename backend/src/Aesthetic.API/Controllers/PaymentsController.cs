@@ -29,6 +29,7 @@ namespace Aesthetic.API.Controllers
 
         [Authorize]
         [HttpPost("create-intent")]
+        [Aesthetic.API.Filters.IdempotencyKeyRequired]
         public async Task<IActionResult> CreatePaymentIntent(CreatePaymentIntentRequest request)
         {
             try

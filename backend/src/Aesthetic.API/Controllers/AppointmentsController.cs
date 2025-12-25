@@ -43,6 +43,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpPost]
+        [Aesthetic.API.Filters.IdempotencyKeyRequired]
         public async Task<IActionResult> BookAppointment(BookAppointmentRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -141,6 +142,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpPut("{appointmentId}/cancel")]
+        [Aesthetic.API.Filters.IdempotencyKeyRequired]
         public async Task<IActionResult> CancelAppointment(Guid appointmentId)
         {
             try

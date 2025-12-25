@@ -12,6 +12,9 @@ namespace Aesthetic.Domain.Entities
         public decimal Price { get; private set; }
         public int DurationMinutes { get; private set; }
         public bool IsActive { get; private set; }
+        public decimal? DepositPercentage { get; private set; }
+        public decimal? CancelFeePercentage { get; private set; }
+        public int? CancelFeeWindowHours { get; private set; }
 
         // Navigation properties
         public virtual Professional Professional { get; private set; } = null!;
@@ -60,6 +63,21 @@ namespace Aesthetic.Domain.Entities
         public void Activate()
         {
             IsActive = true;
+            UpdateTimestamp();
+        }
+
+        public void UpdatePolicies(decimal? depositPercentage, decimal? cancelFeePercentage, int? cancelFeeWindowHours)
+        {
+            if (depositPercentage is not null && (depositPercentage < 0 || depositPercentage > 1))
+                throw new ArgumentException("DepositPercentage must be between 0 and 1.", nameof(depositPercentage));
+            if (cancelFeePercentage is not null && (cancelFeePercentage < 0 || cancelFeePercentage > 1))
+                throw new ArgumentException("CancelFeePercentage must be between 0 and 1.", nameof(cancelFeePercentage));
+            if (cancelFeeWindowHours is not null && cancelFeeWindowHours < 0)
+                throw new ArgumentException("CancelFeeWindowHours must be >= 0.", nameof(cancelFeeWindowHours));
+
+            DepositPercentage = depositPercentage;
+            CancelFeePercentage = cancelFeePercentage;
+            CancelFeeWindowHours = cancelFeeWindowHours;
             UpdateTimestamp();
         }
     }

@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
+using Aesthetic.Infrastructure.Payments;
 
 namespace Aesthetic.API.Controllers
 {
@@ -16,13 +18,16 @@ namespace Aesthetic.API.Controllers
     {
         private readonly ISender _sender;
         private readonly IConfiguration _configuration;
+        private readonly StripeSettings _stripeSettings;
 
         public ConnectController(
             ISender sender,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IOptions<StripeSettings> stripeSettings)
         {
             _sender = sender;
             _configuration = configuration;
+            _stripeSettings = stripeSettings.Value;
         }
 
         [HttpPost("onboarding")]
@@ -56,7 +61,7 @@ namespace Aesthetic.API.Controllers
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             var stripeSignature = Request.Headers["Stripe-Signature"];
-            var webhookSecret = _configuration["Stripe:WebhookSecret"]; // Ensure this is set in appsettings.json
+            var webhookSecret = _stripeSettings.WebhookSecret;
 
             try
             {
