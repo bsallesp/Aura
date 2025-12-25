@@ -117,12 +117,20 @@ namespace Aesthetic.API.Controllers
              // For now skipping ownership check for simplicity but noting it.
             try
             {
-                await _sender.Send(new DeactivateServiceCommand(serviceId));
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null) return Unauthorized();
+                var actorUserId = Guid.Parse(userIdClaim.Value);
+
+                await _sender.Send(new DeactivateServiceCommand(serviceId, actorUserId));
                 return NoContent();
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
             catch (Exception ex)
             {
@@ -154,6 +162,10 @@ namespace Aesthetic.API.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
         }
     }

@@ -9,18 +9,26 @@ public class UpdateServicePoliciesCommandHandler : IRequestHandler<UpdateService
     private readonly IServiceRepository _serviceRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuditService _auditService;
+    private readonly IProfessionalRepository _professionalRepository;
 
-    public UpdateServicePoliciesCommandHandler(IServiceRepository serviceRepository, IUnitOfWork unitOfWork, IAuditService auditService)
+    public UpdateServicePoliciesCommandHandler(IServiceRepository serviceRepository, IUnitOfWork unitOfWork, IAuditService auditService, IProfessionalRepository professionalRepository)
     {
         _serviceRepository = serviceRepository;
         _unitOfWork = unitOfWork;
         _auditService = auditService;
+        _professionalRepository = professionalRepository;
     }
 
     public async Task Handle(UpdateServicePoliciesCommand request, CancellationToken cancellationToken)
     {
         var service = await _serviceRepository.GetByIdAsync(request.ServiceId);
         if (service == null) throw new KeyNotFoundException("Service not found.");
+
+        var professional = await _professionalRepository.GetByUserIdAsync(request.ActorUserId);
+        if (professional == null || service.ProfessionalId != professional.Id)
+        {
+            throw new UnauthorizedAccessException("Only the owning professional can update service policies.");
+        }
 
         service.UpdatePolicies(request.DepositPercentage, request.CancelFeePercentage, request.CancelFeeWindowHours);
         await _serviceRepository.UpdateAsync(service);
