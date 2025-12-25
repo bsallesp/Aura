@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Appointments;
 using Aesthetic.Application.Appointments.Commands.BookAppointment;
 using Aesthetic.Application.Appointments.Commands.CancelAppointment;
@@ -13,7 +14,8 @@ using System.Security.Claims;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("appointments")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/appointments")]
     [Authorize]
     public class AppointmentsController : ControllerBase
     {

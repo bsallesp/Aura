@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Users;
 using Aesthetic.Application.Users.Queries.GetUser;
 using MediatR;
@@ -8,7 +9,8 @@ using System.Security.Claims;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("users")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/users")]
     public class UsersController : ControllerBase
     {
         private readonly ISender _sender;

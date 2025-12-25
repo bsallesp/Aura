@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Authentication;
 using Aesthetic.Application.Authentication.Commands.Register;
 using Aesthetic.Application.Authentication.Queries.Login;
@@ -7,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/auth")]
     public class AuthController : ControllerBase
     {
         private readonly ISender _sender;

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.Application.Connect.Commands.StartOnboarding;
 using Aesthetic.Application.Connect.Commands.UpdateStripeAccountStatus;
 using MediatR;
@@ -8,7 +9,8 @@ using System.Security.Claims;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/connect")]
     [Authorize]
     public class ConnectController : ControllerBase
     {

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Services;
 using Aesthetic.Application.Professionals.Queries.GetProfile;
 using Aesthetic.Application.Services.Commands.CreateService;
@@ -12,7 +13,8 @@ using System.Security.Claims;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("services")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/services")]
     public class ServicesController : ControllerBase
     {
         private readonly ISender _sender;

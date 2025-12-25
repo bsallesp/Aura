@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Payments;
 using Aesthetic.Application.Payments.Commands.CreatePaymentIntent;
 using MediatR;
@@ -7,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("payments")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/payments")]
     [Authorize]
     public class PaymentsController : ControllerBase
     {

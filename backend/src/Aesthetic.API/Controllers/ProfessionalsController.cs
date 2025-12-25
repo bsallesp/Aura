@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Aesthetic.API.Contracts.Professionals;
 using Aesthetic.Application.Professionals.Commands.CreateProfile;
 using Aesthetic.Application.Professionals.Commands.UpdateAvailability;
@@ -13,7 +14,8 @@ using System.Security.Claims;
 namespace Aesthetic.API.Controllers
 {
     [ApiController]
-    [Route("professionals")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/professionals")]
     public class ProfessionalsController : ControllerBase
     {
         private readonly ISender _sender;
