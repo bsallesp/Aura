@@ -30,7 +30,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Professional")]
         public async Task<IActionResult> CreateService(CreateServiceRequest request)
         {
             try
@@ -110,7 +110,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpDelete("{serviceId}")]
-        [Authorize]
+        [Authorize(Roles = "Professional")]
         public async Task<IActionResult> DeactivateService(Guid serviceId)
         {
              // Ideally we should check if the current user owns this service.
@@ -131,7 +131,7 @@ namespace Aesthetic.API.Controllers
         }
 
         [HttpPut("{serviceId}/policies")]
-        [Authorize]
+        [Authorize(Roles = "Professional")]
         public async Task<IActionResult> UpdatePolicies(Guid serviceId, UpdateServicePoliciesRequest request)
         {
             try

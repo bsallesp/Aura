@@ -12,6 +12,7 @@
 
 ## Endpoints (Examples)
 - POST `/auth/register` → register user (Professional/Client).
+  - Professional capabilities require `role=Professional` in JWT.
 - POST `/auth/login` → obtain JWT.
 - POST `/connect/start` → initiate Stripe onboarding, returns Account Link URL.
 - POST `/payments/create-intent` → create PaymentIntent for `AppointmentId`. Uses deposit if configured.
@@ -20,6 +21,7 @@
 - PUT `/appointments/{appointmentId}/cancel` → cancel; applies fee if in window.
 - GET `/services` → list active services (cached 60s).
 - PUT `/services/{serviceId}/policies` → update deposit/cancel policies.
+  - Requires role: `Professional`.
 - GET `/health`, `/health/ready`, `/health/live` → health probes.
 
 ## Request/Response (Samples)
@@ -43,6 +45,17 @@ Headers:
 Body:
   { "DepositPercentage": 0.25, "CancelFeePercentage": 0.50, "CancelFeeWindowHours": 24 }
 Response: 204 No Content
+
+- Cancel Appointment
+```http
+PUT /appointments/{appointmentId}/cancel
+Headers:
+  Authorization: Bearer <token>
+  Idempotency-Key: 1e2d...
+Response: 204 No Content
+Notes:
+- If within `CancelFeeWindowHours`, a fee is calculated as `CancelFeePercentage * PriceAtBooking` and persisted.
+```
 ```
 
 ## Errors

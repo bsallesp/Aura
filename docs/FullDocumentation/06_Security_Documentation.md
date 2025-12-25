@@ -2,7 +2,7 @@
 
 ## Authentication / Authorization
 - Authentication: JWT Bearer.
-- Authorization: RBAC/ABAC planned, enforcing minimum necessary access in Medical.
+- Authorization: RBAC enforced for Professional/Admin endpoints; ABAC planned for Medical minimum necessary access.
 - MFA optional for Medical portal access.
 
 ## Encryption

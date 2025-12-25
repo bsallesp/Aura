@@ -88,8 +88,15 @@ builder.Services.AddAuthentication(defaultScheme: JwtBearerDefaults.Authenticati
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Secret"]!))
+            Encoding.UTF8.GetBytes(jwtSettings["Secret"]!)),
+        RoleClaimType = "role"
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ProfessionalOnly", policy => policy.RequireRole("Professional"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi("v1", options =>
